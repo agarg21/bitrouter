@@ -125,6 +125,7 @@ jobs:
     timeout-minutes: 60
     env:
       BITROUTER_BUILD_REVISION: ${{ github.sha }}
+      CARGO_BUILD_JOBS: '4'
     steps:
     - uses: actions/checkout@v6
     - uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -141,10 +142,10 @@ jobs:
     - name: Build tests and process fixtures once
       run: |
         mkdir -p ci-evidence
-        /usr/bin/time -v -o ci-evidence/build-tests.txt cargo nextest run --locked --workspace --all-features --build-jobs 2 --no-run
-        /usr/bin/time -v -o ci-evidence/build-fixtures.txt cargo build --locked --workspace --all-features --examples --jobs 2
+        /usr/bin/time -v -o ci-evidence/build-tests.txt cargo nextest run --locked --workspace --all-features --build-jobs 4 --no-run
+        /usr/bin/time -v -o ci-evidence/build-fixtures.txt cargo build --locked --workspace --all-features --examples --jobs 4
         # Archive without recompiling, including the now-built process fixtures.
-        cargo nextest archive --locked --workspace --all-features --build-jobs 2 --profile ci --archive-file tests.tar.zst
+        cargo nextest archive --locked --workspace --all-features --build-jobs 4 --profile ci --archive-file tests.tar.zst
         cargo nextest list --workspace --all-features --message-format json > ci-evidence/test-inventory.json
         printf '%s\n' "$GITHUB_SHA" > tests.sha
         printf '%s\n' "$GITHUB_WORKSPACE" > tests.workspace
